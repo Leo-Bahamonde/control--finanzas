@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Control Mensual de Finanzas</title>
+    <!-- Fuentes Google -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css" />
+  </head>
+
+  <body>
+    <div class="container">
+      <header>
+        <h1>📊 Resumen del Mes</h1>
+      </header>
+
+      <!-- Panel de Totales -->
+      <section class="panel" id="panel-totales">
+        <div class="card card-ingreso">
+          <h3>Total Ingresos</h3>
+          <p id="total-ingresos">$0</p>
+        </div>
+        <div class="card card-egreso">
+          <h3>Total Egresos</h3>
+          <p id="total-egresos">$0</p>
+        </div>
+        <div class="card">
+          <h3>Diezmo (10%)</h3>
+          <p id="total-diezmo">$0</p>
+        </div>
+        <div class="card card-saldo">
+          <h3>Saldo Actual</h3>
+          <p id="saldo-actual">$0</p>
+        </div>
+        <!-- Diferencia mes anterior (placeholder para futura implementación) 
+        <div class="card">
+          <h3>Diferencia Mes Anterior</h3>
+          <p id="diferencia-mes">$0</p>
+        </div>
+        -->
+      </section>
+
+      <div class="main-content">
+        <!-- Sección Ingresos -->
+        <div class="column ingreso-column">
+            <h2>Ingresos</h2>
+            
+            <!-- Formulario Ingresos (Sin tablas) -->
+            <div class="input-group">
+                <input type="text" class="input-des-ingreso" placeholder="Descripción (Ej: Sueldo)">
+                <input type="number" class="input-importe-ingreso" placeholder="Monto ($)">
+                <button class="btn btn-ingresos btn-disabled" disabled>
+                    <span class="icon">+</span> Agregar
+                </button>
+            </div>
+
+            <!-- Tabla Resultados Ingresos -->
+            <div class="list-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Fecha</th>
+                            <th>Descripción</th>
+                            <th>Monto</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody class="resultadoIngreso">
+                        <!-- Filas dinámicas -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Sección Egresos -->
+        <div class="column egreso-column">
+            <h2>Egresos</h2>
+
+            <!-- Formulario Egresos (Sin tablas) -->
+            <div class="input-group">
+                <input type="text" class="descripcionEgresos" placeholder="Descripción (Ej: Alquiler)">
+                <input type="number" class="importesEgresos" placeholder="Monto ($)">
+                <button class="btn btn-guardarEgresos btn-disabled" disabled>
+                    <span class="icon">-</span> Agregar
+                </button>
+            </div>
+
+            <!-- Tabla Resultados Egresos -->
+            <div class="list-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Fecha</th>
+                            <th>Descripción</th>
+                            <th>Monto</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody class="resultadoEgreso">
+                        <!-- Filas dinámicas -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+      </div>
+
+    </div>
+    <script src="scripts.js"></script>
+  </body>
+</html>

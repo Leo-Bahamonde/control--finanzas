@@ -1,0 +1,37 @@
+{
+  "name": "pagina-resumen-del-mes",
+  "version": "1.0.0",
+  "main": "scripts.js",
+  "type": "module",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Leo-Bahamonde/control--finanzas.git"
+  },
+
+  
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Leo-Bahamonde/control--finanzas/issues"
+  },
+  "homepage": "https://github.com/Leo-Bahamonde/control--finanzas#readme",
+  "dependencies": {
+    "cors": "^2.8.6",
+    "express": "^5.2.1",
+    "mysql2": "^3.22.3"
+  },
+  
+  "description": ""
+  
+  
+}
+
+
+
+
+

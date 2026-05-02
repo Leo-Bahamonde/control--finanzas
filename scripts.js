@@ -226,3 +226,150 @@ function validarInputs() {
   validarBoton(inputDescIngreso, inputMontoIngreso, btnAgregarIngreso);
   validarBoton(inputDescEgreso, inputMontoEgreso, btnAgregarEgreso);
 }
+
+
+//Guardar datos en MySQL
+async function guardarMovimiento(descripcion, importe, tipo) {
+  try {
+    const res = await fetch("http://localhost:3000/movimientos", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        descripcion,
+        importe: Number(importe),
+        tipo // "ingreso" o "egreso"
+      })
+    });
+
+    const data = await res.text();
+    console.log(data);
+
+  } catch (error) {
+    console.error("Error al guardar:", error);
+  }
+}
+// Guardar datos en MySQL
+btnGuardarIngresos.addEventListener("click", () => {
+  const descripcion = descripcionIngresos.value.trim();
+  const importe = importesIngresos.value.trim();
+
+  if (!descripcion || !importe) return;
+
+  guardarMovimiento(descripcion, importe, "ingreso");
+
+  descripcionIngresos.value = "";
+  importesIngresos.value = "";
+});
+
+//egresos
+
+btnGuardarEgresos.addEventListener("click", () => {
+  const descripcion = descripcionEgresos.value.trim();
+  const importe = importesEgresos.value.trim();
+
+  if (!descripcion || !importe) return;
+
+  guardarMovimiento(descripcion, importe, "egreso");
+
+  descripcionEgresos.value = "";
+  importesEgresos.value = "";
+});
+
+//obtener datos
+async function obtenerMovimientos() {
+  try {
+    const res = await fetch("http://localhost:3000/movimientos");
+    const data = await res.json();
+
+    renderMovimientos(data);
+
+  } catch (error) {
+    console.error("Error al obtener:", error);
+  }
+}
+
+//Renderizar (separar ingresos y egresos)
+
+function renderMovimientos(data) {
+  tbodyIngresos.innerHTML = "";
+  tbodyEgresos.innerHTML = "";
+
+  let totalIng = 0;
+  let totalEgr = 0;
+
+  data.forEach(item => {
+    const row = document.createElement("tr");
+
+    row.innerHTML = `
+      <td>${item.fecha}</td>
+      <td>${item.descripcion}</td>
+      <td>${Number(item.importe).toLocaleString("es-AR", {
+        style: "currency",
+        currency: "ARS",
+        minimumFractionDigits: 0
+      })}</td>
+    `;
+
+    if (item.tipo === "ingreso") {
+      tbodyIngresos.appendChild(row);
+      totalIng += Number(item.importe);
+    } else {
+      tbodyEgresos.appendChild(row);
+      totalEgr += Number(item.importe);
+    }
+  });
+
+  actualizarTotales(totalIng, totalEgr);
+}
+
+//totales y saldo
+
+function actualizarTotales(ingresos, egresos) {
+  document.querySelector("#total-ingresos").textContent =
+    ingresos.toLocaleString("es-AR", { style: "currency", currency: "ARS", minimumFractionDigits: 0 });
+
+  document.querySelector("#total-egresos").textContent =
+    egresos.toLocaleString("es-AR", { style: "currency", currency: "ARS", minimumFractionDigits: 0 });
+
+  const saldo = ingresos - egresos;
+
+  document.querySelector("#saldo-actual").textContent =
+    saldo.toLocaleString("es-AR", { style: "currency", currency: "ARS", minimumFractionDigits: 0 });
+}
+
+//Ejecutar al cargar
+
+document.addEventListener("DOMContentLoaded", () => {
+  obtenerMovimientos();
+});
+
+
+//Agregar botón con ID
+row.innerHTML = `
+  <td>${item.fecha}</td>
+  <td>${item.descripcion}</td>
+  <td>${Number(item.importe).toLocaleString("es-AR", {
+    style: "currency",
+    currency: "ARS",
+    minimumFractionDigits: 0
+  })}</td>
+  <td>
+    <button class="btn-borrar" data-id="${item.id}">Borrar</button>
+  </td>
+`;
+
+//evento borrar
+document.addEventListener("click", async (e) => {
+  if (e.target.classList.contains("btn-borrar")) {
+
+    const id = e.target.dataset.id;
+
+    await fetch(`http://localhost:3000/movimientos/${id}`, {
+      method: "DELETE"
+    });
+
+    obtenerMovimientos(); // 🔥 recarga datos desde MySQL
+  }
+});

@@ -10,23 +10,27 @@ import egresosRoutes from "./routes/egresos.js";
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
 const app = express();
-const PORT = 3000;
+
+// Puerto dinámico: Render asigna el puerto via process.env.PORT.
+// En desarrollo local se usa 3000 como fallback.
+const PORT = process.env.PORT || 3000;
 
 // === Middlewares ===
 
 // cors() permite que el frontend haga requests desde cualquier origen.
-// En desarrollo local esto es necesario si abrís index.html como file://
-// En producción deberías restringirlo con { origin: "https://tudominio.com" }
+// Como frontend y backend están en el mismo servidor (express.static),
+// en producción el navegador no necesita CORS, pero lo dejamos por compatibilidad
+// con herramientas de desarrollo y clientes externos.
 app.use(cors());
 
 // express.json() parsea el body de requests con Content-Type: application/json
 // Sin esto, req.body sería undefined en los POST
 app.use(express.json());
 
-// Servir archivos estáticos (HTML, CSS, JS del frontend) desde la raíz del proyecto.
-// Esto permite acceder al frontend desde http://localhost:3000 directamente,
-// eliminando problemas de CORS por file:// y unificando frontend+backend en un puerto.
-app.use(express.static(__dirname));
+// Servir archivos estáticos (HTML, CSS, JS del frontend) desde la carpeta public/.
+// Esto aísla el frontend del backend: solo se exponen los archivos dentro de public/,
+// protegiendo server.js, config/db.js, package.json y otros archivos sensibles.
+  app.use(express.static(join(__dirname, "public")));
 
 // === Rutas de la API ===
 
@@ -35,8 +39,42 @@ app.use(express.static(__dirname));
 app.use("/ingresos", ingresosRoutes);
 app.use("/egresos", egresosRoutes);
 
-// === Levantar servidor ===
-
-app.listen(PORT, () => {
-  console.log(`🚀 Servidor corriendo en http://localhost:${PORT}`);
+// === Ruta de health check ===
+// Útil para que Render verifique que el servidor está activo.
+// Render hace peticiones periódicas a esta ruta para monitorear el estado.
+app.get("/health", (req, res) => {
+  res.status(200).json({ status: "ok", timestamp: new Date().toISOString() });
 });
+
+// === Manejo de rutas no encontradas (404) ===
+// Si ninguna ruta anterior matcheó, devolvemos un 404 con formato JSON.
+// Esto evita que Express devuelva HTML genérico en endpoints de API inexistentes.
+app.use((req, res) => {
+  res.status(404).json({ error: "Ruta no encontrada" });
+});
+
+// === Manejo global de errores ===
+// Express reconoce este middleware por tener 4 parámetros (err, req, res, next).
+// Captura cualquier error no manejado en las rutas y devuelve un 500 limpio.
+// En producción ocultamos detalles del error; en desarrollo los mostramos.
+app.use((err, req, res, next) => {
+  console.error("❌ Error no manejado:", err.stack || err.message);
+
+  const isProduction = process.env.NODE_ENV === "production";
+
+  res.status(err.status || 500).json({
+    error: isProduction
+      ? "Error interno del servidor"
+      : err.message || "Error interno del servidor",
+  });
+});
+
+// === Levantar servidor ===
+// Escuchar en 0.0.0.0 es necesario para Render.
+// Por defecto Node escucha solo en localhost (127.0.0.1), lo que impide
+// conexiones externas en contenedores de Render.
+app.listen(PORT, "0.0.0.0", () => {
+  console.log(`🚀 Servidor corriendo en puerto ${PORT}`);
+  console.log(`📌 Entorno: ${process.env.NODE_ENV || "development"}`);
+});
+

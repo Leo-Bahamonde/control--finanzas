@@ -1,15 +1,15 @@
 import mysql from "mysql2/promise";
 
-// Pool de conexiones en vez de una conexión única.
-// El pool maneja automáticamente:
-// - Reutilización de conexiones inactivas
-// - Reconexión si MySQL se reinicia
-// - Límite de conexiones simultáneas (waitForConnections: true)
+// Pool de conexiones usando variables de entorno.
+// Railway provee automáticamente estas variables cuando vinculás un servicio MySQL:
+//   MYSQLHOST, MYSQLUSER, MYSQLPASSWORD, MYSQLDATABASE, MYSQLPORT
+// En desarrollo local, se leen desde el archivo .env (ver .env.example)
 const pool = mysql.createPool({
-  host: "localhost",
-  user: "leo",
-  password: "1234",
-  database: "control_finanzas",
+  host: process.env.MYSQLHOST || "localhost",
+  user: process.env.MYSQLUSER || "root",
+  password: process.env.MYSQLPASSWORD || "",
+  database: process.env.MYSQLDATABASE || "control_finanzas",
+  port: Number(process.env.MYSQLPORT) || 3306,
   waitForConnections: true,
   connectionLimit: 10,
   // Devuelve las filas como objetos JS planos (comportamiento por defecto,
@@ -24,8 +24,14 @@ try {
   console.log("🟢 Conectado a MySQL (pool activo)");
   connection.release(); // Devuelve la conexión al pool
 } catch (error) {
-  console.error("🔴 Error al conectar a MySQL:", error.message);
-  process.exit(1); // Si no hay DB, no tiene sentido levantar el servidor
+  console.error("❌ Error MySQL:");
+  console.error(error);
+  // En producción no hacemos process.exit(1) inmediatamente para permitir
+  // que Railway termine de provisionar la DB. El servidor arranca igual
+  // y las rutas devolverán error 500 si la DB no está disponible.
+  if (process.env.NODE_ENV !== "production") {
+    process.exit(1); // En desarrollo sí cortamos, porque es un error local
+  }
 }
 
 export default pool;

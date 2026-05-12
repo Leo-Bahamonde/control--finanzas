@@ -1,10 +1,13 @@
 // ============================================================
 // Control de Finanzas — Frontend
-// Conecta con backend Express en http://localhost:3000
+// Conecta con backend Express (mismo origen via express.static)
 // Rutas: GET/POST/DELETE /ingresos y /egresos
 // ============================================================
 
-const API_URL = "http://localhost:3000";
+// URL base vacía = rutas relativas al mismo origen.
+// Funciona tanto en localhost:3000 como en producción (Render),
+// porque Express sirve el frontend y la API desde el mismo servidor.
+const API_URL = "";
 
 let ingresos = [];
 let egresos = [];

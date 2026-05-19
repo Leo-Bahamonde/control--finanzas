@@ -3,12 +3,20 @@ import pool from "../config/db.js";
 
 const router = Router();
 
-// GET /ingresos — Obtener todos los ingresos ordenados por fecha descendente
+// GET /ingresos — Obtener todos los ingresos ordenados por fecha descendente o filtrados por mes/año
 router.get("/", async (req, res) => {
   try {
-    const [rows] = await pool.query(
-      "SELECT id, descripcion, monto, fecha FROM ingresos ORDER BY fecha DESC, id DESC"
-    );
+    const { mes, anio } = req.query;
+    let query = "SELECT id, descripcion, monto, fecha FROM ingresos";
+    let params = [];
+
+    if (mes && anio) {
+      query += " WHERE MONTH(fecha) = ? AND YEAR(fecha) = ?";
+      params.push(Number(mes), Number(anio));
+    }
+
+    query += " ORDER BY fecha DESC, id DESC";
+    const [rows] = await pool.query(query, params);
     res.json(rows);
   } catch (error) {
     console.error("Error al obtener ingresos:", error);
@@ -20,7 +28,7 @@ router.get("/", async (req, res) => {
 // Body esperado: { descripcion: string, monto: number }
 router.post("/", async (req, res) => {
   try {
-    const { descripcion, monto } = req.body;
+    const { descripcion, monto, fecha } = req.body;
 
     // Validación básica en el servidor (nunca confiar solo en el frontend)
     if (!descripcion || typeof descripcion !== "string" || descripcion.trim() === "") {
@@ -32,10 +40,15 @@ router.post("/", async (req, res) => {
       return res.status(400).json({ error: "El monto debe ser un número mayor a 0" });
     }
 
-    const [result] = await pool.query(
-      "INSERT INTO ingresos (descripcion, monto) VALUES (?, ?)",
-      [descripcion.trim(), montoNumero]
-    );
+    let insertQuery = "INSERT INTO ingresos (descripcion, monto) VALUES (?, ?)";
+    let insertParams = [descripcion.trim(), montoNumero];
+
+    if (fecha) {
+      insertQuery = "INSERT INTO ingresos (descripcion, monto, fecha) VALUES (?, ?, ?)";
+      insertParams.push(fecha);
+    }
+
+    const [result] = await pool.query(insertQuery, insertParams);
 
     // Devolvemos el registro completo para que el frontend lo use sin hacer otro GET
     const [rows] = await pool.query(

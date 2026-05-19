@@ -43,6 +43,86 @@ h1 {
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
+  margin-bottom: 0.5rem;
+}
+
+/* === Navegación de Meses === */
+.month-navigation {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 15px;
+  margin-top: 10px;
+}
+
+#current-month-display {
+  font-size: 1.5rem;
+  min-width: 180px;
+  color: var(--text-main);
+  text-transform: capitalize;
+}
+
+.btn-nav {
+  background: var(--card-bg);
+  color: var(--text-main);
+  border: 1px solid var(--border-color);
+  padding: 8px 16px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-family: inherit;
+  font-size: 0.9rem;
+  min-height: 44px; /* Touch target for mobile */
+}
+
+.btn-nav:hover:not(:disabled) {
+  background: var(--border-color);
+  transform: translateY(-1px);
+}
+
+.btn-nav:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* === Tabs === */
+.tabs {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.tab-btn {
+  background: var(--card-bg);
+  color: var(--text-muted);
+  border: 1px solid var(--border-color);
+  padding: 10px 20px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+  font-family: inherit;
+  transition: all 0.2s;
+  min-height: 44px;
+}
+
+.tab-btn.active {
+  background: var(--accent-blue);
+  color: white;
+  border-color: var(--accent-blue);
+}
+
+.tab-btn:hover:not(.active) {
+  background: var(--border-color);
+  color: var(--text-main);
+}
+
+.tab-content {
+  display: none;
+}
+
+.tab-content.active {
+  display: block;
 }
 
 /* === Panel Totales (Cards) === */
@@ -129,14 +209,16 @@ input {
   border-radius: 8px;
   outline: none;
   transition: border-color 0.2s;
+  font-family: inherit;
+  min-height: 44px;
 }
 
 input:focus {
   border-color: var(--accent-blue);
 }
 
-input[type="number"] {
-  max-width: 120px;
+input[type="number"], input[type="date"] {
+  max-width: 140px;
 }
 
 /* === Botones === */
@@ -149,7 +231,10 @@ input[type="number"] {
   transition: all 0.2s;
   display: flex;
   align-items: center;
+  justify-content: center;
   gap: 5px;
+  min-height: 44px;
+  font-family: inherit;
 }
 
 .btn-disabled {
@@ -215,12 +300,110 @@ td { color: var(--text-main); }
 .btn-borrar { background: rgba(239, 68, 68, 0.2); color: var(--accent-red); border: 1px solid var(--accent-red); }
 .btn-borrar:hover { background: var(--accent-red); color: white; }
 
-/* Responsive adjustments */
+/* === Top 5 y Barras === */
+.top5-container {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  margin-bottom: 20px;
+}
+
+.top5-item {
+  background: rgba(0, 0, 0, 0.2);
+  padding: 12px;
+  border-radius: 8px;
+  border: 1px solid var(--border-color);
+}
+
+.top5-header {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 8px;
+  font-size: 0.95rem;
+}
+
+.top5-cat { font-weight: 600; }
+.top5-monto { color: var(--text-muted); }
+
+.top5-bar-bg {
+  width: 100%;
+  height: 8px;
+  background: var(--border-color);
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.top5-bar-fill {
+  height: 100%;
+  border-radius: 4px;
+  transition: width 0.5s ease-out;
+}
+
+.ingreso-column .top5-bar-fill { background: var(--accent-green); }
+.egreso-column .top5-bar-fill { background: var(--accent-red); }
+
+.top5-summary {
+  background: rgba(0, 0, 0, 0.3);
+  padding: 15px;
+  border-radius: 8px;
+  text-align: center;
+  border: 1px solid var(--border-color);
+}
+
+.top5-summary h4 {
+  color: var(--text-muted);
+  margin-bottom: 5px;
+}
+
+.top5-summary p {
+  font-size: 1.2rem;
+  font-weight: bold;
+  color: var(--text-main);
+}
+
+/* === Responsive adjustments === */
 @media (max-width: 768px) {
+  body {
+    padding: 10px;
+  }
+  
+  h1 {
+    font-size: 2rem;
+  }
+  
+  #current-month-display {
+    font-size: 1.2rem;
+    min-width: 140px;
+  }
+  
   .input-group {
     flex-direction: column;
   }
-  input[type="number"] { max-width: 100%; }
   
-  .main-content { grid-template-columns: 1fr; }
+  input[type="number"], input[type="date"] { 
+    max-width: 100%; 
+  }
+  
+  .main-content { 
+    grid-template-columns: 1fr; 
+  }
+  
+  .panel {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 375px) {
+  .panel {
+    grid-template-columns: 1fr;
+  }
+  
+  .month-navigation {
+    flex-direction: column;
+    gap: 10px;
+  }
+  
+  .btn-nav {
+    width: 100%;
+  }
 }
